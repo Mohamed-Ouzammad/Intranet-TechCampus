@@ -1,38 +1,113 @@
+"use client";
+
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { login } from "@/lib/auth";
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>();
 
-  const onSubmit = (data: any) => {
-    console.log("Login:", data);
-    // TODO: call backend login
+  const router = useRouter();
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setServerError(null);
+    try {
+      await login(data.email, data.password);
+      router.push("/dashboard");
+    } catch (err) {
+      setServerError(
+        err instanceof Error ? err.message : "Identifiants invalides"
+      );
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6">Connexion</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+        <h1 className="mb-2 text-2xl font-bold">Connexion</h1>
+        <p className="mb-6 text-sm text-gray-600">
+          Connectez-vous pour accéder à votre espace intranet.
+        </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            {...register("email")}
-            className="border p-3 rounded-md"
-          />
+        {serverError && (
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {serverError}
+          </div>
+        )}
 
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            {...register("password")}
-            className="border p-3 rounded-md"
-          />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+          noValidate
+        >
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="prenom.nom@tech-campus.fr"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:border-blue-500 focus:ring-1"
+              {...register("email", {
+                required: "L’email est obligatoire",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Email invalide",
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-xs text-red-600">{errors.email.message}</p>
+            )}
+          </div>
 
-          <button className="bg-primary text-white py-2 rounded-md hover:bg-primary/90">
-            Se connecter
+          <div className="flex flex-col gap-1">
+            <label
+              className="text-sm font-medium text-gray-700"
+              htmlFor="password"
+            >
+              Mot de passe
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Votre mot de passe"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:border-blue-500 focus:ring-1"
+              {...register("password", {
+                required: "Le mot de passe est obligatoire",
+                minLength: {
+                  value: 6,
+                  message: "Au moins 6 caractères",
+                },
+              })}
+            />
+            {errors.password && (
+              <p className="text-xs text-red-600">{errors.password.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isSubmitting ? "Connexion..." : "Se connecter"}
           </button>
         </form>
       </div>
     </div>
   );
 }
+
