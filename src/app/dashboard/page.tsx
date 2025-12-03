@@ -26,8 +26,9 @@ export default function DashboardPage() {
   }
 
   const isEtudiant = role === "etudiant";
-  const isEnseignant = role === "enseignant";
-  const isStaff = role === "staff";
+  const isIntervenant = role === "intervenant";
+  const isAssistant = role === "assistant_pedagogique";
+  const isResponsable = role === "responsable_pedagogique";
   const isAdmin = role === "admin";
 
   return (
@@ -37,8 +38,9 @@ export default function DashboardPage() {
           Tableau de bord{" "}
           <span className="text-blue-600">
             {isEtudiant && "Étudiant"}
-            {isEnseignant && "Enseignant"}
-            {isStaff && "Staff"}
+            {isIntervenant && "Intervenant"}
+            {isAssistant && "Assistant pédagogique"}
+            {isResponsable && "Responsable pédagogique"}
             {isAdmin && "Admin"}
           </span>
         </h1>
@@ -108,7 +110,7 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {isEnseignant && (
+        {isIntervenant && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
             <header className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold">
@@ -126,11 +128,11 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {isStaff && (
+        {isAssistant && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
             <header className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold">
-                Documents à traiter (staff)
+                Dossiers à traiter (assistant pédagogique)
               </h2>
             </header>
             <ul className="space-y-2 text-sm text-slate-700">
