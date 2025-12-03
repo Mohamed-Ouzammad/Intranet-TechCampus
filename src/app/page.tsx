@@ -1,22 +1,6 @@
 export default function Home() {
   return (
     <>
-      {/* En-tête simplifié inspiré de la maquette HTML */}
-      <header className="sticky top-0 z-40 w-full border-b bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-          <div className="flex items-center gap-3">
-            <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white ring-1 ring-blue-600/15">
-              <span className="text-sm font-bold">TC</span>
-            </span>
-            <span className="hidden select-none text-base font-semibold text-slate-800 sm:inline">
-              Tech Campus — Intranet
-            </span>
-            <span className="ml-2 hidden rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-blue-100 sm:inline-block">
-              Accueil
-            </span>
-          </div>
-        </div>
-      </header>
 
       {/* Contenu Accueil (statique pour l’instant, sans changement de rôle ni de page) */}
       <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">
