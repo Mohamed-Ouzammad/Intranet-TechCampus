@@ -166,7 +166,7 @@ function mapBackendRoleToFrontendRole(backendRole: string): Role {
 
 export async function login(email: string, password: string): Promise<User> {
   try {
-    const response = await fetch("http://localhost:3000/auth/login", {
+    const response = await fetch("https://back-intra.onrender.com/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
