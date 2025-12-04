@@ -10,7 +10,7 @@ type LoginFormValues = {
   password: string;
 };
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const {
     register,
     handleSubmit,
@@ -121,4 +121,4 @@ export const LoginPage = () => {
       </div>
     </div>
   );
-};
+}
