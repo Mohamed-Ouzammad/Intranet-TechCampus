@@ -10,7 +10,7 @@ type LoginFormValues = {
   password: string;
 };
 
-export default function LoginPage() {
+export const LoginPage = () => {
   const {
     register,
     handleSubmit,
@@ -22,18 +22,22 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
+
     try {
       await login(data.email, data.password);
       router.push("/dashboard");
     } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : "Identifiants invalides"
-      );
+      // Récupération propre du message d'erreur
+      if (err instanceof Error) {
+        setServerError(err.message);
+      } else {
+        setServerError("Identifiants incorrects");
+      }
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
         <h1 className="mb-2 text-2xl font-bold">Connexion</h1>
         <p className="mb-6 text-sm text-gray-600">
@@ -51,6 +55,7 @@ export default function LoginPage() {
           className="flex flex-col gap-4"
           noValidate
         >
+          {/* EMAIL */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700" htmlFor="email">
               Email
@@ -59,7 +64,9 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="prenom.nom@tech-campus.fr"
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:border-blue-500 focus:ring-1"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none 
+                        placeholder:text-gray-500
+                        focus:border-blue-500 focus:ring-1 ring-blue-500"
               {...register("email", {
                 required: "L’email est obligatoire",
                 pattern: {
@@ -73,6 +80,7 @@ export default function LoginPage() {
             )}
           </div>
 
+          {/* PASSWORD */}
           <div className="flex flex-col gap-1">
             <label
               className="text-sm font-medium text-gray-700"
@@ -84,7 +92,9 @@ export default function LoginPage() {
               id="password"
               type="password"
               placeholder="Votre mot de passe"
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:border-blue-500 focus:ring-1"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none
+                        placeholder:text-gray-500
+                        focus:border-blue-500 focus:ring-1 ring-blue-500"
               {...register("password", {
                 required: "Le mot de passe est obligatoire",
                 minLength: {
@@ -98,10 +108,12 @@ export default function LoginPage() {
             )}
           </div>
 
+          {/* SUBMIT */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white 
+                       hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSubmitting ? "Connexion..." : "Se connecter"}
           </button>
@@ -109,5 +121,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
-
+};

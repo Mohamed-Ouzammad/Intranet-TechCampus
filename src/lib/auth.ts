@@ -6,20 +6,18 @@ export type Role =
   | "admin";
 
 export type User = {
-  id: string;
+  id: string | number;
   email: string;
   role: Role;
 };
 
 export type FeatureKey =
-  // Navigation principale
   | "dashboard"
   | "planning_view"
   | "documents"
   | "notes"
   | "messages"
   | "admin"
-  // Fonctions métier
   | "notes_consultation"
   | "notes_saisie"
   | "notes_validation"
@@ -35,14 +33,9 @@ export type FeatureKey =
   | "ecoles_gestion";
 
 const STORAGE_KEY = "tc_current_user";
+const TOKEN_KEY = "tc_token";
 
 export const ROLE_PERMISSIONS: Record<Role, FeatureKey[]> = {
-  // Étudiant :
-  // - Consulter ses notes
-  // - Accéder aux cours & documents
-  // - Gérer ses documents administratifs / renouvellements
-  // - Contacter intervenant / responsable (messagerie)
-  // - Voir son planning
   etudiant: [
     "dashboard",
     "planning_view",
@@ -54,12 +47,6 @@ export const ROLE_PERMISSIONS: Record<Role, FeatureKey[]> = {
     "documents_depots",
     "messagerie",
   ],
-
-  // Intervenant :
-  // - Consulter ses cours
-  // - Déposer des fichiers & supports
-  // - Noter les étudiants
-  // - Contacter étudiants / responsables
   intervenant: [
     "dashboard",
     "planning_view",
@@ -71,12 +58,6 @@ export const ROLE_PERMISSIONS: Record<Role, FeatureKey[]> = {
     "notes_saisie",
     "messagerie",
   ],
-
-  // Assistant pédagogique :
-  // - Modifier les notes après validation
-  // - Valider / vérifier documents (casier, identité, etc.)
-  // - Vérifier infos étudiants / intervenants
-  // - Peut être assigné à plusieurs écoles (géré côté données)
   assistant_pedagogique: [
     "dashboard",
     "planning_view",
@@ -87,13 +68,6 @@ export const ROLE_PERMISSIONS: Record<Role, FeatureKey[]> = {
     "documents_validation",
     "messagerie",
   ],
-
-  // Responsable pédagogique :
-  // - Créer / gérer les cours
-  // - Déposer des documents
-  // - Gérer les absences (Edusign, etc.)
-  // - Valider les notes
-  // - Communiquer avec intervenants & étudiants
   responsable_pedagogique: [
     "dashboard",
     "planning_view",
@@ -107,9 +81,6 @@ export const ROLE_PERMISSIONS: Record<Role, FeatureKey[]> = {
     "notes_validation",
     "messagerie",
   ],
-
-  // Admin (local ou global, selon ton backend) :
-  // - Gestion complète : utilisateurs, rôles, écoles, etc.
   admin: [
     "dashboard",
     "planning_view",
@@ -139,59 +110,77 @@ export function canAccess(role: Role | null, feature: FeatureKey): boolean {
 
 export function getCurrentUser(): User | null {
   if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as User;
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
-export function setCurrentUser(user: User | null) {
+export function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setCurrentUser(user: User | null, token?: string) {
   if (typeof window === "undefined") return;
+
   if (!user) {
-    window.localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(TOKEN_KEY);
   } else {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
   }
 }
 
-// Mock d'authentification : en vrai, on appellerait le backend ici.
-export async function login(email: string, _password: string): Promise<User> {
-  // Simule un délai réseau
-  await new Promise((res) => setTimeout(res, 400));
+/* ---------------------------------------------------
+   🔐 VRAI LOGIN AVEC TON BACKEND
+--------------------------------------------------- */
+export async function login(email: string, password: string): Promise<User> {
+  const response = await fetch("http://localhost:3000/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-  if (!email.includes("@")) {
-    throw new Error("Identifiants invalides");
+  if (!response.ok) {
+    throw new Error("Identifiants incorrects");
   }
 
-  let role: Role = "etudiant";
-  const lower = email.toLowerCase();
-  if (lower.includes("admin")) role = "admin";
-  else if (lower.includes("intervenant") || lower.includes("prof")) role = "intervenant";
-  else if (lower.includes("assist")) role = "assistant_pedagogique";
-  else if (
-    lower.includes("responsable") ||
-    lower.includes("rp") ||
-    lower.includes("pedagog")
-  )
-    role = "responsable_pedagogique";
+  const data = await response.json();
+
+  // FORMAT ATTENDU (exemple)
+  // {
+  //   "user": {
+  //       "id": 11,
+  //       "email": "momo@test.com",
+  //       "role": "admin"
+  //   },
+  //   "token": "eyJhbGciOi..."
+  // }
+
+  if (!data.user || !data.token)
+    throw new Error("Réponse invalide du serveur");
 
   const user: User = {
-    id: "u-" + Math.random().toString(36).slice(2, 8),
-    email,
-    role,
+    id: data.user.id,
+    email: data.user.email,
+    role: data.user.role,
   };
 
-  setCurrentUser(user);
+  setCurrentUser(user, data.token);
+
   return user;
 }
 
+/* ---------------------------------------------------
+   🚪 LOGOUT
+--------------------------------------------------- */
 export function logout() {
   setCurrentUser(null);
 }
-
-
-
-
