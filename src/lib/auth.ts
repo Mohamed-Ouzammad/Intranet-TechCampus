@@ -146,49 +146,90 @@ export function setCurrentUser(user: User | null, token?: string) {
   }
 }
 
-/* ---------------------------------------------------
-   🔐 VRAI LOGIN AVEC TON BACKEND
---------------------------------------------------- */
-export async function login(email: string, password: string): Promise<User> {
-  const response = await fetch("http://localhost:3000/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Identifiants incorrects");
-  }
-
-  const data = await response.json();
-
-  // FORMAT ATTENDU (exemple)
-  // {
-  //   "user": {
-  //       "id": 11,
-  //       "email": "momo@test.com",
-  //       "role": "admin"
-  //   },
-  //   "token": "eyJhbGciOi..."
-  // }
-
-  if (!data.user || !data.token)
-    throw new Error("Réponse invalide du serveur");
-
-  const user: User = {
-    id: data.user.id,
-    email: data.user.email,
-    role: data.user.role,
+/**
+ * Mappe les rôles du backend vers les rôles du frontend
+ */
+function mapBackendRoleToFrontendRole(backendRole: string): Role {
+  const roleMap: Record<string, Role> = {
+    student: "etudiant",
+    teacher: "intervenant",
+    responsable_pedagogique: "responsable_pedagogique",
+    assistant_pedagogique: "assistant_pedagogique",
+    admin: "admin",
+    // Support des anciens noms si besoin
+    etudiant: "etudiant",
+    intervenant: "intervenant",
   };
 
-  setCurrentUser(user, data.token);
-
-  return user;
+  return roleMap[backendRole] || "etudiant"; // Par défaut étudiant si rôle inconnu
 }
 
-/* ---------------------------------------------------
-   🚪 LOGOUT
---------------------------------------------------- */
+export async function login(email: string, password: string): Promise<User> {
+  try {
+    const response = await fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      // Essayer de récupérer le message d'erreur du backend
+      let errorMessage = "Identifiants incorrects";
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch {
+        // Si pas de JSON, utiliser le message par défaut
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+
+    // Le backend peut renvoyer soit { user: {...}, token: "..." }
+    // soit directement { id, email, role, token }
+    let userData: any;
+    let token: string | undefined;
+
+    if (data.user) {
+      // Format: { user: {...}, token: "..." }
+      userData = data.user;
+      token = data.token;
+    } else if (data.id && data.email && data.role) {
+      // Format: { id, email, role, token }
+      userData = { id: data.id, email: data.email, role: data.role };
+      token = data.token;
+    } else {
+      throw new Error("Format de réponse invalide du serveur");
+    }
+
+    if (!userData || !userData.email || !userData.role) {
+      throw new Error("Données utilisateur manquantes dans la réponse");
+    }
+
+    // Mapper le rôle backend → frontend
+    const frontendRole = mapBackendRoleToFrontendRole(userData.role);
+
+    const user: User = {
+      id: userData.id,
+      email: userData.email,
+      role: frontendRole,
+    };
+
+    setCurrentUser(user, token);
+
+    return user;
+  } catch (error) {
+    // Re-lancer l'erreur pour que le composant puisse l'afficher
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Erreur de connexion au serveur");
+  }
+}
+
 export function logout() {
   setCurrentUser(null);
 }

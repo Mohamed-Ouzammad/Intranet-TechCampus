@@ -27,12 +27,13 @@ export default function LoginPage() {
       await login(data.email, data.password);
       router.push("/dashboard");
     } catch (err) {
-      // Récupération propre du message d'erreur
       if (err instanceof Error) {
         setServerError(err.message);
       } else {
-        setServerError("Identifiants incorrects");
+        setServerError("Erreur de connexion. Vérifiez vos identifiants.");
       }
+      // Log pour débogage (à retirer en production)
+      console.error("Erreur de login:", err);
     }
   };
 

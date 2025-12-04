@@ -70,7 +70,6 @@ export default function DocumentsPage() {
                   <input
                     type="file"
                     className="text-xs"
-                    // maquette : pas de logique d'upload réelle pour l'instant
                   />
                 </div>
                 <button
