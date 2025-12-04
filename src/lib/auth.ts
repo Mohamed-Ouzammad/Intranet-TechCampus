@@ -144,6 +144,9 @@ export function setCurrentUser(user: User | null, token?: string) {
       localStorage.setItem(TOKEN_KEY, token);
     }
   }
+
+  // Émettre un événement personnalisé pour notifier les composants du changement
+  window.dispatchEvent(new CustomEvent("auth-change", { detail: { user } }));
 }
 
 /**

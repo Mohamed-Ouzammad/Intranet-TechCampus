@@ -2,30 +2,65 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { canAccess, getCurrentUser, logout, Role } from "@/lib/auth";
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push("/login");
-    } else {
-      setRole(user.role);
-      setEmail(user.email);
-    }
-    setIsLoading(false);
-  }, [router]);
+    // Fonction pour mettre à jour le rôle et l'email
+    const updateUser = () => {
+      const user = getCurrentUser();
+      if (!user) {
+        // Ne rediriger que si on n'est pas déjà sur la page de login
+        if (pathname !== "/login") {
+          router.push("/login");
+        }
+        setRole(null);
+        setEmail(null);
+      } else {
+        setRole(user.role);
+        setEmail(user.email);
+      }
+      setIsLoading(false);
+    };
+
+    // Charger l'utilisateur au montage et à chaque changement de route
+    updateUser();
+
+    // Écouter les changements d'authentification (événement personnalisé)
+    const handleAuthChange = () => {
+      updateUser();
+    };
+
+    // Écouter les changements de localStorage (pour les changements cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "tc_current_user") {
+        updateUser();
+      }
+    };
+
+    window.addEventListener("auth-change", handleAuthChange);
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [pathname, router]);
 
   const handleLogout = () => {
     logout();
     router.push("/login");
   };
+
+  // Ne pas afficher le header sur la page de login
+  if (pathname === "/login") return null;
 
   if (isLoading) return null;
 
