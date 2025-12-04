@@ -11,6 +11,14 @@ export type User = {
   role: Role;
 };
 
+export const ROLE_LABELS: Record<Role, string> = {
+  etudiant: "Étudiant",
+  intervenant: "Intervenant",
+  assistant_pedagogique: "Assistant pédagogique",
+  responsable_pedagogique: "Responsable pédagogique",
+  admin: "Administrateur",
+};
+
 export type FeatureKey =
   | "dashboard"
   | "planning_view"
