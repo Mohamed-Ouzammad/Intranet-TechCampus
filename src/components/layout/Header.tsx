@@ -69,7 +69,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
 
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <span className="h-8 w-8 flex items-center justify-center rounded-lg bg-blue-600 text-white text-sm font-bold">
             TC
           </span>
