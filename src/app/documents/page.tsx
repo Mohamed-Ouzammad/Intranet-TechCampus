@@ -7,6 +7,9 @@ import { getCurrentUser, Role, ROLE_LABELS, canAccess } from "@/lib/auth";
 export default function DocumentsPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [documentType, setDocumentType] = useState<string>("CVEC");
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -16,6 +19,43 @@ export default function DocumentsPage() {
       setRole(user.role);
     }
   }, [router]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      alert("Veuillez sélectionner un fichier");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      // TODO: Remplacer par un vrai appel API
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("type", documentType);
+
+      // Simule un délai d'upload
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      alert(`Document "${selectedFile.name}" déposé avec succès ! (Simulation)`);
+      setSelectedFile(null);
+      // Reset le input file
+      const fileInput = document.getElementById("file-input") as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+    } catch (error) {
+      alert("Erreur lors du dépôt du document");
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   if (!role) {
     return (
@@ -33,7 +73,7 @@ export default function DocumentsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold">Documents administratifs</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Documents administratifs</h1>
         <p className="mt-1 text-sm text-gray-600">
           Vue adaptée au rôle : <span className="font-medium">{roleLabel}</span>
         </p>
@@ -44,23 +84,27 @@ export default function DocumentsPage() {
         {(role === "etudiant" || role === "intervenant") &&
           canAccess(role, "documents_depots") && (
             <section className="rounded-xl border bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold">
+              <h2 className="mb-3 text-base font-semibold text-gray-900">
                 Déposer un document
               </h2>
               <p className="mb-2 text-xs text-gray-500">
                 Exemple : CVEC, justificatif de domicile, casier judiciaire,
                 pièce d&apos;identité...
               </p>
-              <form className="space-y-3 text-sm">
+              <form onSubmit={handleSubmit} className="space-y-3 text-sm">
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-700">
                     Type de document
                   </label>
-                  <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs">
-                    <option>CVEC</option>
-                    <option>Justificatif de domicile</option>
-                    <option>Pièce d&apos;identité</option>
-                    <option>Casier judiciaire</option>
+                  <select
+                    value={documentType}
+                    onChange={(e) => setDocumentType(e.target.value)}
+                    className="rounded-md border border-gray-300 px-2 py-1.5 text-xs"
+                  >
+                    <option value="CVEC">CVEC</option>
+                    <option value="Justificatif de domicile">Justificatif de domicile</option>
+                    <option value="Pièce d'identité">Pièce d&apos;identité</option>
+                    <option value="Casier judiciaire">Casier judiciaire</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -68,15 +112,24 @@ export default function DocumentsPage() {
                     Fichier
                   </label>
                   <input
+                    id="file-input"
                     type="file"
-                    className="text-xs"
+                    onChange={handleFileChange}
+                    className="text-xs cursor-pointer file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                   />
+                  {selectedFile && (
+                    <p className="mt-1 text-xs text-gray-600">
+                      Fichier sélectionné : {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                  )}
                 </div>
                 <button
-                  type="button"
-                  className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
+                  type="submit"
+                  disabled={!selectedFile || isUploading}
+                  className="w-full rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Déposer le document
+                  {isUploading ? "Dépôt en cours..." : "Déposer le document"}
                 </button>
               </form>
             </section>
@@ -84,7 +137,7 @@ export default function DocumentsPage() {
 
         {/* Tous : suivi de ses documents */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-base font-semibold">
+          <h2 className="mb-3 text-base font-semibold text-gray-900">
             Mes documents et statuts
           </h2>
           <p className="mb-2 text-xs text-gray-500">
@@ -132,7 +185,7 @@ export default function DocumentsPage() {
         {/* Assistant / RP / Admin : validation des documents */}
         {canValidate && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
-            <h2 className="mb-3 text-base font-semibold">
+            <h2 className="mb-3 text-base font-semibold text-gray-900">
               Documents à valider
             </h2>
             <p className="mb-2 text-xs text-gray-500">

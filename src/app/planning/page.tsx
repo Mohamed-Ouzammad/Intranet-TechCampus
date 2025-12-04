@@ -63,7 +63,7 @@ export default function PlanningPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-semibold">Planning</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Planning</h1>
           <p className="mt-1 text-sm text-gray-600">
             Consultez les séances de cours par jour, semaine ou mois.
           </p>

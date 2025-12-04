@@ -110,6 +110,11 @@ export default function Header() {
               Admin
             </Link>
           )}
+          {role && (
+            <Link href="/profile" className="hover:text-blue-600">
+              Profil
+            </Link>
+          )}
         </nav>
 
         {/* RIGHT : User + Logout */}

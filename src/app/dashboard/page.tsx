@@ -34,7 +34,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-semibold text-gray-900">
           Tableau de bord{" "}
           <span className="text-blue-600">
             {isEtudiant && "Étudiant"}
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         {/* Planning du jour – visible pour tous */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <header className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-semibold">Planning du jour</h2>
+            <h2 className="text-base font-semibold text-gray-900">Planning du jour</h2>
           </header>
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
@@ -72,7 +72,7 @@ export default function DashboardPage() {
         {isEtudiant && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
             <header className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">Dernières notes</h2>
+              <h2 className="text-base font-semibold text-gray-900">Dernières notes</h2>
             </header>
             <div className="overflow-hidden rounded-lg border">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -113,7 +113,7 @@ export default function DashboardPage() {
         {isIntervenant && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
             <header className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">
+              <h2 className="text-base font-semibold text-gray-900">
                 Supports à publier / classes
               </h2>
             </header>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
         {isAssistant && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
             <header className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">
+              <h2 className="text-base font-semibold text-gray-900">
                 Dossiers à traiter (assistant pédagogique)
               </h2>
             </header>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
         {/* Bloc commun : documents récents */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <header className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-semibold">Documents récents</h2>
+            <h2 className="text-base font-semibold text-gray-900">Documents récents</h2>
           </header>
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">

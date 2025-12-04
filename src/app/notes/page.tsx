@@ -30,7 +30,7 @@ export default function NotesPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold">Notes</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Notes</h1>
         <p className="mt-1 text-sm text-gray-600">
           Vue adaptée au rôle : <span className="font-medium">{roleLabel}</span>
         </p>
@@ -41,7 +41,7 @@ export default function NotesPage() {
         {role === "etudiant" && (
           <>
             <section className="rounded-xl border bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold">
+              <h2 className="mb-3 text-base font-semibold text-gray-900">
                 Mes notes et ECTS
               </h2>
               <p className="mb-2 text-xs text-gray-500">
@@ -75,7 +75,7 @@ export default function NotesPage() {
             </section>
 
             <section className="rounded-xl border bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold">
+              <h2 className="mb-3 text-base font-semibold text-gray-900">
                 Mes absences
               </h2>
               <ul className="space-y-2 text-sm text-slate-700">
@@ -93,7 +93,7 @@ export default function NotesPage() {
         {/* Intervenant : soumission des notes */}
         {role === "intervenant" && canAccess(role, "notes_saisie") && (
           <section className="rounded-xl border bg-white p-5 shadow-sm">
-            <h2 className="mb-3 text-base font-semibold">
+            <h2 className="mb-3 text-base font-semibold text-gray-900">
               Saisie des notes (maquette)
             </h2>
             <p className="mb-2 text-xs text-gray-500">
@@ -144,7 +144,7 @@ export default function NotesPage() {
         {role === "responsable_pedagogique" &&
           canAccess(role, "notes_validation") && (
             <section className="rounded-xl border bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold">
+              <h2 className="mb-3 text-base font-semibold text-gray-900">
                 Validation des notes
               </h2>
               <p className="mb-2 text-xs text-gray-500">
@@ -172,7 +172,7 @@ export default function NotesPage() {
         {role === "assistant_pedagogique" &&
           canAccess(role, "notes_modif_apres_validation") && (
             <section className="rounded-xl border bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold">
+              <h2 className="mb-3 text-base font-semibold text-gray-900">
                 Modification exceptionnelle
               </h2>
               <p className="mb-2 text-xs text-gray-500">
