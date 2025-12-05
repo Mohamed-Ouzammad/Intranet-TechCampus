@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser, Role, ROLE_LABELS } from "@/lib/auth";
@@ -18,7 +17,6 @@ export default function ProfilePage() {
   const [role, setRole] = useState<Role | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const {
     register,
     handleSubmit,
@@ -32,12 +30,10 @@ export default function ProfilePage() {
       router.push("/login");
     } else {
       setRole(user.role);
-      // Charger les données du profil (mock pour l'instant)
-      // TODO: Remplacer par un appel API pour récupérer les vraies données
       reset({
         firstName: "Mohamed",
-        lastName: "Ouzama",
-        dateOfBirth: "1995-01-15",
+        lastName: "Ouzammad",
+        dateOfBirth: "1999-11-09",
         email: user.email,
         postalAddress: "123 Rue de la République, 75001 Paris",
       });
@@ -47,7 +43,6 @@ export default function ProfilePage() {
   const onSubmit = async (data: UserProfile) => {
     setIsSaving(true);
     try {
-      // TODO: Remplacer par un vrai appel API pour sauvegarder
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert("Profil mis à jour avec succès ! (Simulation)");
       setIsEditing(false);
@@ -61,7 +56,7 @@ export default function ProfilePage() {
 
   if (!role) {
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gray-900">
         Chargement de votre profil...
       </div>
     );
@@ -70,12 +65,12 @@ export default function ProfilePage() {
   const roleLabel = ROLE_LABELS[role];
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 text-gray-900">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Mon profil</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Rôle : <span className="font-medium">{roleLabel}</span>
+          <p className="mt-1 text-sm text-gray-900">
+            Rôle : <span className="font-medium text-gray-900">{roleLabel}</span>
           </p>
         </div>
         {!isEditing && (
@@ -87,14 +82,13 @@ export default function ProfilePage() {
           </button>
         )}
       </header>
-
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Prénom */}
             <div className="flex flex-col gap-1">
               <label
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-900"
                 htmlFor="firstName"
               >
                 Prénom
@@ -107,7 +101,7 @@ export default function ProfilePage() {
                     {...register("firstName", {
                       required: "Le prénom est obligatoire",
                     })}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {errors.firstName && (
                     <p className="text-xs text-red-600">
@@ -121,11 +115,10 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             {/* Nom */}
             <div className="flex flex-col gap-1">
               <label
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-900"
                 htmlFor="lastName"
               >
                 Nom
@@ -138,7 +131,7 @@ export default function ProfilePage() {
                     {...register("lastName", {
                       required: "Le nom est obligatoire",
                     })}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {errors.lastName && (
                     <p className="text-xs text-red-600">
@@ -148,15 +141,14 @@ export default function ProfilePage() {
                 </>
               ) : (
                 <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
-                  Ouzama
+                  Ouzammad
                 </p>
               )}
             </div>
-
             {/* Date de naissance */}
             <div className="flex flex-col gap-1">
               <label
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-900"
                 htmlFor="dateOfBirth"
               >
                 Date de naissance
@@ -169,7 +161,7 @@ export default function ProfilePage() {
                     {...register("dateOfBirth", {
                       required: "La date de naissance est obligatoire",
                     })}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {errors.dateOfBirth && (
                     <p className="text-xs text-red-600">
@@ -179,15 +171,14 @@ export default function ProfilePage() {
                 </>
               ) : (
                 <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
-                  15/01/1995
+                  09/11/1999
                 </p>
               )}
             </div>
-
             {/* Email */}
             <div className="flex flex-col gap-1">
               <label
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-900"
                 htmlFor="email"
               >
                 Adresse email
@@ -204,7 +195,7 @@ export default function ProfilePage() {
                         message: "Email invalide",
                       },
                     })}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {errors.email && (
                     <p className="text-xs text-red-600">{errors.email.message}</p>
@@ -217,11 +208,10 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-
           {/* Adresse postale */}
           <div className="flex flex-col gap-1">
             <label
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-900"
               htmlFor="postalAddress"
             >
               Adresse postale
@@ -234,7 +224,7 @@ export default function ProfilePage() {
                   {...register("postalAddress", {
                     required: "L'adresse postale est obligatoire",
                   })}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
                 {errors.postalAddress && (
                   <p className="text-xs text-red-600">
@@ -248,7 +238,6 @@ export default function ProfilePage() {
               </p>
             )}
           </div>
-
           {/* Boutons d'action */}
           {isEditing && (
             <div className="flex gap-3 pt-4">
@@ -265,7 +254,7 @@ export default function ProfilePage() {
                   setIsEditing(false);
                   reset();
                 }}
-                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
               >
                 Annuler
               </button>
@@ -276,4 +265,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

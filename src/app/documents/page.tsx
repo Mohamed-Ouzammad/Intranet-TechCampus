@@ -99,7 +99,7 @@ export default function DocumentsPage() {
                   <select
                     value={documentType}
                     onChange={(e) => setDocumentType(e.target.value)}
-                    className="rounded-md border border-gray-300 px-2 py-1.5 text-xs"
+                    className="rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-600"
                   >
                     <option value="CVEC">CVEC</option>
                     <option value="Justificatif de domicile">Justificatif de domicile</option>

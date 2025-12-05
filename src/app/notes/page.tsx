@@ -104,7 +104,7 @@ export default function NotesPage() {
                 <label className="text-xs font-medium text-gray-700">
                   Cours
                 </label>
-                <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs">
+                <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-600">
                   <option>Dev Web – A2</option>
                   <option>Algo – A2</option>
                 </select>
@@ -113,7 +113,7 @@ export default function NotesPage() {
                 <p className="mb-2 text-xs font-medium text-gray-600">
                   Étudiants (exemple)
                 </p>
-                <div className="flex items-center justify-between gap-3 border-b py-1 text-xs">
+                <div className="flex items-center justify-between gap-3 border-b py-1 text-xs text-gray-600">
                   <span>Dupont Léa</span>
                   <input
                     type="number"
@@ -121,7 +121,7 @@ export default function NotesPage() {
                     placeholder="Note"
                   />
                 </div>
-                <div className="flex items-center justify-between gap-3 py-1 text-xs">
+                <div className="flex items-center justify-between gap-3 py-1 text-xs text-gray-600">
                   <span>Martin Hugo</span>
                   <input
                     type="number"
