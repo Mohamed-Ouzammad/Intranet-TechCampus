@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { canAccess, FeatureKey, getCurrentUser, Role } from "@/lib/auth";
+import { canAccess, getCurrentUser, Role } from "@/lib/auth";
 
 type ViewMode = "jour" | "semaine" | "mois";
 
@@ -12,14 +12,15 @@ const viewLabels: Record<ViewMode, string> = {
   mois: "Mois",
 };
 
-const promotions = ["A1", "A2", "B3"];
-const salles = ["B201", "D101", "Amphi"];
+// Liste fictive des promotions (intervenant = ses classes / RP = toutes)
+const ALL_PROMOS = ["A1", "A2", "B3", "InfoDev 1", "InfoDev 2", "InfoDev 3"];
 
+// Maquette temporaire avant connexion API
 const MOCK_COURS = [
   {
     id: 1,
     titre: "Algo",
-    promo: "A2",
+    promo: "InfoDev 3",
     enseignant: "M. Dupont",
     salle: "B201",
     horaire: "08:30–10:00",
@@ -27,7 +28,7 @@ const MOCK_COURS = [
   {
     id: 2,
     titre: "Dev Web",
-    promo: "A2",
+    promo: "InfoDev 3",
     enseignant: "Mme Martin",
     salle: "D101",
     horaire: "10:15–12:00",
@@ -38,46 +39,63 @@ export default function PlanningPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("semaine");
-  const [promoFilter, setPromoFilter] = useState<string>("toutes");
-  const [salleFilter, setSalleFilter] = useState<string>("toutes");
+
+  const [promoList, setPromoList] = useState<string[]>([]);
+  const [selectedPromo, setSelectedPromo] = useState<string>("");
+
+  const intervenantPromos = ["InfoDev 3", "A1"];
 
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) {
       router.push("/login");
-    } else {
-      setRole(user.role);
+      return;
+    }
+
+    setRole(user.role);
+
+    if (user.role === "etudiant") {
+      setPromoList([]); 
+    } else if (user.role === "intervenant") {
+      setPromoList(intervenantPromos);
+      setSelectedPromo(intervenantPromos[0]);
+    } else if (user.role === "responsable_pedagogique" || user.role === "admin") {
+      setPromoList(ALL_PROMOS);
+      setSelectedPromo(ALL_PROMOS[0]);
     }
   }, [router]);
 
-  const filteredCours = MOCK_COURS.filter((c) => {
-    if (promoFilter !== "toutes" && c.promo !== promoFilter) return false;
-    if (salleFilter !== "toutes" && c.salle !== salleFilter) return false;
-    return true;
-  });
+  // Filtres appliqués seulement si Intervenant ou RP/Admin
+  const coursFiltrés =
+    role === "etudiant"
+      ? MOCK_COURS // plus tard : filtre par promo de l'étudiant
+      : MOCK_COURS.filter((c) => c.promo === selectedPromo);
 
-  const canEdit =
-    role && canAccess(role, "planning_edit" as FeatureKey);
+  const isEtudiant = role === "etudiant";
+  const isIntervenant = role === "intervenant";
+  const isRP = role === "responsable_pedagogique";
+  const isAdmin = role === "admin";
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
+
+      {/* HEADER */}
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Planning</h1>
           <p className="mt-1 text-sm text-gray-600">
-            Consultez les séances de cours par jour, semaine ou mois.
+            Consultez les séances par jour, semaine ou mois.
           </p>
         </div>
 
+        {/* Vue jour/semaine/mois */}
         <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-xs font-medium text-gray-700">
           {(Object.keys(viewLabels) as ViewMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
               className={`rounded-md px-3 py-1 ${
-                viewMode === mode
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-gray-50"
+                viewMode === mode ? "bg-blue-600 text-white" : "hover:bg-gray-50"
               }`}
             >
               {viewLabels[mode]}
@@ -86,161 +104,72 @@ export default function PlanningPage() {
         </div>
       </header>
 
-      {/* Filtres */}
-      <section className="rounded-xl border bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-gray-800">
-          Filtres
-        </h2>
-        <div className="flex flex-wrap gap-4 text-sm">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-gray-600">Promo</span>
-            <select
-              value={promoFilter}
-              onChange={(e) => setPromoFilter(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-xs"
-            >
-              <option value="toutes">Toutes</option>
-              {promotions.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* FILTRES PAR CLASSE */}
+      {(isIntervenant || isRP || isAdmin) && (
+        <section className="rounded-xl border bg-white p-4 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold text-gray-800">Sélection de la classe</h2>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-gray-600">Salle</span>
-            <select
-              value={salleFilter}
-              onChange={(e) => setSalleFilter(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-xs"
-            >
-              <option value="toutes">Toutes</option>
-              {salles.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+          <select
+            value={selectedPromo}
+            onChange={(e) => setSelectedPromo(e.target.value)}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+          >
+            {promoList.map((promo) => (
+              <option key={promo} value={promo}>
+                {promo}
+              </option>
+            ))}
+          </select>
+        </section>
+      )}
+
+      {/* ACTIONS SPÉCIFIQUES AU RÔLE */}
+      <section className="flex justify-end">
+        {isIntervenant && (
+          <button className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            Mes disponibilités
+          </button>
+        )}
+
+        {(isRP || isAdmin) && (
+          <button className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
+            Ajouter un cours
+          </button>
+        )}
       </section>
 
-      {/* Vue "calendrier" simplifiée */}
+      {/* PLANNING */}
       <section className="rounded-xl border bg-white p-4 shadow-sm">
         <header className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-800">
-            Vue {viewLabels[viewMode]} (maquette statique)
+            Vue {viewLabels[viewMode]} – {isEtudiant ? "Votre planning" : selectedPromo}
           </h2>
-          <span className="text-xs text-gray-500">
-            À connecter plus tard à l&apos;API temps réel
-          </span>
+          <span className="text-xs text-gray-500">Maquette statique</span>
         </header>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 text-gray-900">
-          {filteredCours.map((cours) => (
+          {coursFiltrés.map((cours) => (
             <article
               key={cours.id}
               className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-gray-900"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{cours.titre}</h3>
-                <span className="text-xs text-gray-700">
-                  {cours.horaire}
-                </span>
+                <span className="text-xs text-gray-700">{cours.horaire}</span>
               </div>
               <p className="text-xs text-gray-700">
-                Promo {cours.promo} • {cours.enseignant} • Salle{" "}
-                {cours.salle}
+                {cours.enseignant} • Salle {cours.salle}
               </p>
             </article>
           ))}
 
-          {filteredCours.length === 0 && (
+          {coursFiltrés.length === 0 && (
             <p className="col-span-full text-sm text-gray-500">
-              Aucun cours ne correspond aux filtres.
+              Aucun cours pour cette classe.
             </p>
           )}
         </div>
       </section>
-
-      {/* Formulaire admin / staff */}
-      {canEdit && (
-        <section className="rounded-xl border bg-white p-4 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-gray-800">
-            Gérer le planning (admin / staff)
-          </h2>
-          <p className="mb-3 text-xs text-gray-500">
-            Formulaire maquetté : à connecter ensuite à l&apos;API de
-            planning (US 6).
-          </p>
-          <form className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">
-                Titre du cours
-              </label>
-              <input
-                type="text"
-                className="rounded-md border border-gray-300 px-2 py-1.5 text-xs"
-                placeholder="Ex : Dev Web – TP Tailwind"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">
-                Promo
-              </label>
-              <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs">
-                {promotions.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">
-                Enseignant
-              </label>
-              <input
-                type="text"
-                className="rounded-md border border-gray-300 px-2 py-1.5 text-xs"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">
-                Salle
-              </label>
-              <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs">
-                {salles.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">
-                Date &amp; heure
-              </label>
-              <input
-                type="datetime-local"
-                className="rounded-md border border-gray-300 px-2 py-1.5 text-xs"
-              />
-            </div>
-
-            <div className="flex items-end">
-              <button
-                type="button"
-                className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
-              >
-                Enregistrer la séance
-              </button>
-            </div>
-          </form>
-        </section>
-      )}
     </div>
   );
 }
-
-
