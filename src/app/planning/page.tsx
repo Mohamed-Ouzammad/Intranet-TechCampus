@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { canAccess, getCurrentUser, Role } from "@/lib/auth";
+import { getCurrentUser, Role } from "@/lib/auth";
 
 type ViewMode = "jour" | "semaine" | "mois";
 
@@ -12,10 +12,8 @@ const viewLabels: Record<ViewMode, string> = {
   mois: "Mois",
 };
 
-// Liste fictive des promotions (intervenant = ses classes / RP = toutes)
 const ALL_PROMOS = ["A1", "A2", "B3", "InfoDev 1", "InfoDev 2", "InfoDev 3"];
 
-// Maquette temporaire avant connexion API
 const MOCK_COURS = [
   {
     id: 1,
@@ -45,6 +43,11 @@ export default function PlanningPage() {
 
   const intervenantPromos = ["InfoDev 3", "A1"];
 
+  // --- Modal disponibilité ---
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedHour, setSelectedHour] = useState("");
+
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) {
@@ -55,20 +58,22 @@ export default function PlanningPage() {
     setRole(user.role);
 
     if (user.role === "etudiant") {
-      setPromoList([]); 
+      setPromoList([]);
     } else if (user.role === "intervenant") {
       setPromoList(intervenantPromos);
       setSelectedPromo(intervenantPromos[0]);
-    } else if (user.role === "responsable_pedagogique" || user.role === "admin") {
+    } else if (
+      user.role === "responsable_pedagogique" ||
+      user.role === "admin"
+    ) {
       setPromoList(ALL_PROMOS);
       setSelectedPromo(ALL_PROMOS[0]);
     }
   }, [router]);
 
-  // Filtres appliqués seulement si Intervenant ou RP/Admin
-  const coursFiltrés =
+  const coursFiltres =
     role === "etudiant"
-      ? MOCK_COURS // plus tard : filtre par promo de l'étudiant
+      ? MOCK_COURS
       : MOCK_COURS.filter((c) => c.promo === selectedPromo);
 
   const isEtudiant = role === "etudiant";
@@ -76,9 +81,27 @@ export default function PlanningPage() {
   const isRP = role === "responsable_pedagogique";
   const isAdmin = role === "admin";
 
+  // --- ENVOI DES DISPONIBILITES ---
+  const handleSubmitAvailability = async () => {
+    if (!selectedDate || !selectedHour) {
+      alert("Merci de remplir la date et l'horaire.");
+      return;
+    }
+
+    // simulation 1 seconde
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    alert(
+      `Votre disponibilité du ${selectedDate} à ${selectedHour} a bien été envoyée ! (Simulation)`
+    );
+
+    setShowModal(false);
+    setSelectedDate("");
+    setSelectedHour("");
+  };
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-
       {/* HEADER */}
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -95,7 +118,9 @@ export default function PlanningPage() {
               key={mode}
               onClick={() => setViewMode(mode)}
               className={`rounded-md px-3 py-1 ${
-                viewMode === mode ? "bg-blue-600 text-white" : "hover:bg-gray-50"
+                viewMode === mode
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-gray-50"
               }`}
             >
               {viewLabels[mode]}
@@ -104,10 +129,12 @@ export default function PlanningPage() {
         </div>
       </header>
 
-      {/* FILTRES PAR CLASSE */}
+      {/* LISTE CLASSES */}
       {(isIntervenant || isRP || isAdmin) && (
         <section className="rounded-xl border bg-white p-4 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-gray-800">Sélection de la classe</h2>
+          <h2 className="mb-3 text-sm font-semibold text-gray-800">
+            Sélection de la classe
+          </h2>
 
           <select
             value={selectedPromo}
@@ -123,10 +150,13 @@ export default function PlanningPage() {
         </section>
       )}
 
-      {/* ACTIONS SPÉCIFIQUES AU RÔLE */}
-      <section className="flex justify-end">
+      {/* ACTIONS SPÉCIFIQUES */}
+      <section className="flex justify-end gap-3">
         {isIntervenant && (
-          <button className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
             Mes disponibilités
           </button>
         )}
@@ -142,13 +172,14 @@ export default function PlanningPage() {
       <section className="rounded-xl border bg-white p-4 shadow-sm">
         <header className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-800">
-            Vue {viewLabels[viewMode]} – {isEtudiant ? "Votre planning" : selectedPromo}
+            Vue {viewLabels[viewMode]} –{" "}
+            {isEtudiant ? "Votre planning" : selectedPromo}
           </h2>
           <span className="text-xs text-gray-500">Maquette statique</span>
         </header>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 text-gray-900">
-          {coursFiltrés.map((cours) => (
+          {coursFiltres.map((cours) => (
             <article
               key={cours.id}
               className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-gray-900"
@@ -163,13 +194,63 @@ export default function PlanningPage() {
             </article>
           ))}
 
-          {coursFiltrés.length === 0 && (
+          {coursFiltres.length === 0 && (
             <p className="col-span-full text-sm text-gray-500">
               Aucun cours pour cette classe.
             </p>
           )}
         </div>
       </section>
+
+      {/* ----------- MODAL DISPONIBILITES ----------- */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Ajouter une disponibilité
+            </h3>
+
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="text-sm text-gray-700">Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-700">Horaire</label>
+                <input
+                  type="time"
+                  value={selectedHour}
+                  onChange={(e) => setSelectedHour(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  onClick={handleSubmitAvailability}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Envoyer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------------------------------------- */}
     </div>
   );
 }
