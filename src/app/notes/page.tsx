@@ -51,14 +51,14 @@ export default function NotesPage() {
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium">
+                      <th className="px-3 py-2 text-left font-medium text-gray-600">
                         Matière
                       </th>
-                      <th className="px-3 py-2 text-left font-medium">Note</th>
-                      <th className="px-3 py-2 text-left font-medium">ECTS</th>
+                      <th className="px-3 py-2 text-left font-medium text-gray-600">Note</th>
+                      <th className="px-3 py-2 text-left font-medium text-gray-600">ECTS</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 bg-white">
+                  <tbody className="divide-y divide-slate-100 bg-white text-gray-600">
                     <tr>
                       <td className="px-3 py-2">Dev Web</td>
                       <td className="px-3 py-2">16/20</td>

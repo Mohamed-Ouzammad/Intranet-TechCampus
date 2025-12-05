@@ -147,12 +147,12 @@ export default function DocumentsPage() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-3 py-2 text-left font-medium">Type</th>
-                  <th className="px-3 py-2 text-left font-medium">Statut</th>
-                  <th className="px-3 py-2 text-left font-medium">Dernière MAJ</th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-600">Type</th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-600">Statut</th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-600">Dernière MAJ</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-slate-100 bg-white text-gray-600">
                 <tr>
                   <td className="px-3 py-2">CVEC</td>
                   <td className="px-3 py-2">

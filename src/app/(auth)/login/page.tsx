@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-        <h1 className="mb-2 text-2xl font-bold">Connexion</h1>
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">Connexion</h1>
         <p className="mb-6 text-sm text-gray-600">
           Connectez-vous pour accéder à votre espace intranet.
         </p>
@@ -65,8 +65,8 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="prenom.nom@tech-campus.fr"
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none 
-                        placeholder:text-gray-500
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none 
+                        placeholder:text-gray-600
                         focus:border-blue-500 focus:ring-1 ring-blue-500"
               {...register("email", {
                 required: "L’email est obligatoire",
@@ -93,8 +93,8 @@ export default function LoginPage() {
               id="password"
               type="password"
               placeholder="Votre mot de passe"
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none
-                        placeholder:text-gray-500
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none
+                        placeholder:text-gray-600
                         focus:border-blue-500 focus:ring-1 ring-blue-500"
               {...register("password", {
                 required: "Le mot de passe est obligatoire",

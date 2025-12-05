@@ -137,19 +137,19 @@ export default function PlanningPage() {
           </span>
         </header>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 text-gray-900">
           {filteredCours.map((cours) => (
             <article
               key={cours.id}
-              className="rounded-lg border bg-slate-50 px-3 py-2 text-sm"
+              className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-gray-900"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{cours.titre}</h3>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-700">
                   {cours.horaire}
                 </span>
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-700">
                 Promo {cours.promo} • {cours.enseignant} • Salle{" "}
                 {cours.salle}
               </p>
