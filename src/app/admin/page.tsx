@@ -4,9 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser, Role, ROLE_LABELS, canAccess } from "@/lib/auth";
 
+const CAMPUS_LIST = ["Paris", "Lyon", "Marseille"]; 
+
 export default function AdminPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
+
+  const [selectedCampus, setSelectedCampus] = useState<string>("Paris");
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -40,7 +44,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-8">
+
+      {/* HEADER */}
       <header>
         <h1 className="text-2xl font-semibold">Administration</h1>
         <p className="mt-1 text-sm text-gray-600">
@@ -48,15 +54,42 @@ export default function AdminPage() {
         </p>
       </header>
 
+      {/* SELECTEUR DE CAMPUS */}
+      <section className="rounded-xl border bg-white p-4 shadow-sm">
+        <h2 className="mb-2 text-sm font-semibold text-gray-800">
+          Sélection du campus
+        </h2>
+
+        <select
+          value={selectedCampus}
+          onChange={(e) => setSelectedCampus(e.target.value)}
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+        >
+          {CAMPUS_LIST.map((campus) => (
+            <option key={campus} value={campus}>
+              {campus}
+            </option>
+          ))}
+        </select>
+
+        <p className="mt-2 text-xs text-gray-500">
+          Affichage des données pour le campus :{" "}
+          <span className="font-medium">{selectedCampus}</span>
+        </p>
+      </section>
+
+      {/* GRID MENU */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Gestion site vitrine / contenus */}
+
+        {/* Gestion site vitrine */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">
             Site vitrine & contenus
           </h2>
           <p className="mb-3 text-xs text-gray-500">
-            Maquette d&apos;un back-office simple type blog / CMS.
+            Données du campus : <strong>{selectedCampus}</strong>
           </p>
+
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
               Modifier la page de présentation de l&apos;école
@@ -70,19 +103,18 @@ export default function AdminPage() {
           </ul>
         </section>
 
-        {/* Gestion utilisateurs & rôles */}
+        {/* Gestion utilisateurs */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">
             Utilisateurs & rôles
           </h2>
           <p className="mb-3 text-xs text-gray-500">
-            Création de comptes, attribution de rôles, gestion par
-            établissement.
+            Données du campus : <strong>{selectedCampus}</strong>
           </p>
+
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
-              Créer un utilisateur (étudiant, intervenant, RP, assistant,
-              admin)
+              Créer un utilisateur (étudiant, intervenant, RP, assistant, admin)
             </li>
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
               Modifier rôle / réinitialiser mot de passe
@@ -93,14 +125,15 @@ export default function AdminPage() {
           </ul>
         </section>
 
-        {/* Gestion des établissements */}
+        {/* Établissements */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">
             Établissements & paramètres
           </h2>
           <p className="mb-3 text-xs text-gray-500">
-            Vue multi-établissements (admin global) ou filtrée (admin local).
+            Données du campus : <strong>{selectedCampus}</strong>
           </p>
+
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
               Créer un nouvel établissement
@@ -111,12 +144,13 @@ export default function AdminPage() {
           </ul>
         </section>
 
-        {/* Monitoring / logs */}
+        {/* Monitoring */}
         <section className="rounded-xl border bg-white p-5 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">Monitoring</h2>
           <p className="mb-3 text-xs text-gray-500">
-            Statistiques d&apos;usage et surveillance technique (maquette).
+            Données du campus : <strong>{selectedCampus}</strong>
           </p>
+
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="rounded-lg border bg-slate-50 px-3 py-2">
               Utilisateurs actifs, volumétrie de documents
@@ -129,10 +163,8 @@ export default function AdminPage() {
             </li>
           </ul>
         </section>
+
       </div>
     </div>
   );
 }
-
-
-
